@@ -1,27 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import axios from 'axios';
-import { Header, Icon, List } from 'semantic-ui-react';
+import { Container } from 'semantic-ui-react';
+import Navigation from './components/Navigation/Navigation';
+import Aux from './hoc/Auxiliary/Auxiliary';
+import Dashboard from './components/Activity/Dashboard/Dashboard';
 
 const App = () => {
-  const [values, setValues] = useState([]);
+  const [activities, setActivities] = useState([]);
   useEffect(() => {
-    axios.get('http://localhost:5000/api/values').then(res => {
-      setValues(res.data);
+    axios.get('http://localhost:5000/api/activities').then(res => {
+      setActivities(res.data);
     });
   }, []);
   return (
-    <div>
-      <Header as='h2'>
-        <Icon name='users' />
-        <Header.Content>Reactivities</Header.Content>
-      </Header>
-      <List>
-        {values.map(v => {
-          return <List.Item key={v.id}>{v.name}</List.Item>;
-        })}
-      </List>
-    </div>
+    <Aux>
+      <Navigation />
+      <Container style={{ marginTop: '7em' }}>
+        <Dashboard activities={activities} />
+      </Container>
+    </Aux>
   );
 };
 
