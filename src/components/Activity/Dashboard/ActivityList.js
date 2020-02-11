@@ -18,7 +18,18 @@ const ActivityList = props => {
                   </div>
                 </Item.Description>
                 <Item.Extra>
-                  <Button floated='right' content='View' color='blue' />
+                  <Button
+                    floated='right'
+                    content='View'
+                    color='blue'
+                    onClick={() => props.select(a.id)}
+                  />
+                  <Button
+                    floated='right'
+                    content='Delete'
+                    color='red'
+                    onClick={() => props.deleteActivity(a.id)}
+                  />
                   <Label basic content={a.category} />
                 </Item.Extra>
               </Item.Content>

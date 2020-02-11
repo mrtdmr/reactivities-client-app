@@ -1,18 +1,25 @@
 import React from 'react';
 import { Menu, Container, Button } from 'semantic-ui-react';
-import Logo from '../../assets/logo.png';
 
-const Navigation = () => {
+const Navigation = props => {
   return (
     <Menu fixed='top' inverted>
       <Container>
         <Menu.Item header>
-          <img src={Logo} alt='Reactivities' style={{ marginRight: '10px' }} />
+          <img
+            src={`/assets/logo.png`}
+            alt='Reactivities'
+            style={{ marginRight: '10px' }}
+          />
           Reactivities
         </Menu.Item>
         <Menu.Item name='Activities' />
         <Menu.Item name='friends'>
-          <Button positive content='Create Activity' />
+          <Button
+            positive
+            content='Create Activity'
+            onClick={props.openCreateForm}
+          />
         </Menu.Item>
       </Container>
     </Menu>
