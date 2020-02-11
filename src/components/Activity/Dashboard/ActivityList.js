@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Item, Button, Label, Segment } from 'semantic-ui-react';
+import { observer } from 'mobx-react-lite';
+import ActivityStore from '../../../stores/activityStore';
 
 const ActivityList = props => {
+  const activityStore = useContext(ActivityStore);
+  const {
+    activitiesByDate,
+    selectActivity,
+    deleteActivity,
+    submitting,
+    target
+  } = activityStore;
   return (
     <Segment clearing>
       <Item.Group divided>
-        {props.activities.map(a => {
+        {activitiesByDate.map(a => {
           return (
             <Item key={a.id}>
               <Item.Content>
@@ -22,15 +32,15 @@ const ActivityList = props => {
                     floated='right'
                     content='View'
                     color='blue'
-                    onClick={() => props.select(a.id)}
+                    onClick={() => selectActivity(a.id)}
                   />
                   <Button
                     name={a.id}
-                    loading={props.target === a.id && props.submitting}
+                    loading={target === a.id && submitting}
                     floated='right'
                     content='Delete'
                     color='red'
-                    onClick={event => props.deleteActivity(event, a.id)}
+                    onClick={event => deleteActivity(event, a.id)}
                   />
                   <Label basic content={a.category} />
                 </Item.Extra>
@@ -43,4 +53,4 @@ const ActivityList = props => {
   );
 };
 
-export default ActivityList;
+export default observer(ActivityList);

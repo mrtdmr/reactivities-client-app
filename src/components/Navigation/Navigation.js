@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Menu, Container, Button } from 'semantic-ui-react';
+import ActivityStore from '../../stores/activityStore';
+import { observer } from 'mobx-react-lite';
 
 const Navigation = props => {
+  const activityStore = useContext(ActivityStore);
   return (
     <Menu fixed='top' inverted>
       <Container>
@@ -18,7 +21,7 @@ const Navigation = props => {
           <Button
             positive
             content='Create Activity'
-            onClick={props.openCreateForm}
+            onClick={activityStore.openCreateForm}
           />
         </Menu.Item>
       </Container>
@@ -26,4 +29,4 @@ const Navigation = props => {
   );
 };
 
-export default Navigation;
+export default observer(Navigation);

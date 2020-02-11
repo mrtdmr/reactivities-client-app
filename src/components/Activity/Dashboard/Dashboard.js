@@ -1,37 +1,25 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Grid } from 'semantic-ui-react';
 import ActivityList from './ActivityList';
 import Detail from '../Detail/Detail';
 import ActivityForm from '../Form/ActivityForm';
+import { observer } from 'mobx-react-lite';
+import ActivityStore from '../../../stores/activityStore';
 
 const Dashboard = props => {
+  const activityStore = useContext(ActivityStore);
+  const { editMode, selectedActivity } = activityStore;
   return (
     <Grid>
       <Grid.Column width={10}>
-        <ActivityList
-          select={props.selected}
-          activities={props.activities}
-          deleteActivity={props.deleteActivity}
-          submitting={props.submitting}
-          target={props.target}
-        />
+        <ActivityList />
       </Grid.Column>
       <Grid.Column width={6}>
-        {props.selectedAct && !props.editMode && (
-          <Detail
-            selectedAct={props.selectedAct}
-            setEditMode={props.setEditMode}
-            setSelectedActivity={props.setSelectedActivity}
-          />
-        )}
-        {props.editMode && (
+        {selectedActivity && !editMode && <Detail />}
+        {editMode && (
           <ActivityForm
-            key={(props.selectedAct && props.selectedAct.id) || 0}
-            setEditMode={props.setEditMode}
-            activity={props.selectedAct}
-            createActivity={props.createActivity}
-            editActivity={props.editActivity}
-            submitting={props.submitting}
+            key={(selectedActivity && selectedActivity.id) || 0}
+            activity={selectedActivity}
           />
         )}
       </Grid.Column>
@@ -39,4 +27,4 @@ const Dashboard = props => {
   );
 };
 
-export default Dashboard;
+export default observer(Dashboard);

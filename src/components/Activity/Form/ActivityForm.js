@@ -1,8 +1,17 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useContext } from 'react';
 import { Segment, Form, Button } from 'semantic-ui-react';
 import { v4 as uuid } from 'uuid';
+import ActivityStore from '../../../stores/activityStore';
+import { observer } from 'mobx-react-lite';
 
 const ActivityForm = props => {
+  const activityStore = useContext(ActivityStore);
+  const {
+    createActivity,
+    editActivity,
+    submitting,
+    cancelFormOpen
+  } = activityStore;
   const initializeForm = () => {
     if (props.activity) return props.activity;
     else
@@ -20,9 +29,9 @@ const ActivityForm = props => {
   const submitHandler = () => {
     if (activity.id.length === 0) {
       let newActivity = { ...activity, id: uuid() };
-      props.createActivity(newActivity);
+      createActivity(newActivity);
     } else {
-      props.editActivity(activity);
+      editActivity(activity);
     }
   };
   const inputChangeHandler = (
@@ -77,17 +86,17 @@ const ActivityForm = props => {
           floated='right'
           type='submit'
           content='Submit'
-          loading={props.submitting}
+          loading={submitting}
         />
         <Button
           floated='right'
           type='submit'
           content='Cancel'
-          onClick={() => props.setEditMode(false)}
+          onClick={cancelFormOpen}
         />
       </Form>
     </Segment>
   );
 };
 
-export default ActivityForm;
+export default observer(ActivityForm);
