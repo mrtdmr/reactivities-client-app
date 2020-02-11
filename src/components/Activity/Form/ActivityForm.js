@@ -72,7 +72,13 @@ const ActivityForm = props => {
           name='venue'
           onChange={inputChangeHandler}
         />
-        <Button positive floated='right' type='submit' content='Submit' />
+        <Button
+          positive
+          floated='right'
+          type='submit'
+          content='Submit'
+          loading={props.submitting}
+        />
         <Button
           floated='right'
           type='submit'

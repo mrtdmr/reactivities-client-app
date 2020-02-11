@@ -5,9 +5,7 @@ axios.defaults.baseURL = 'http://localhost:5000/api';
 const responseBody = (response: AxiosResponse) => response.data;
 
 const sleep = ms => (response: AxiosResponse) =>
-  new Promise() <
-  AxiosResponse >
-  (resolve => setTimeout(() => resolve(response), ms));
+  new Promise(resolve => setTimeout(() => resolve(response), ms));
 
 const requests = {
   get: (url: string) =>
@@ -25,7 +23,7 @@ const requests = {
       .put(url, body)
       .then(sleep(1000))
       .then(responseBody),
-  del: (url: string) =>
+  delete: (url: string) =>
     axios
       .delete(url)
       .then(sleep(1000))
@@ -38,7 +36,7 @@ const Activities = {
   create: (activity: IActivity) => requests.post('/activities', activity),
   update: (activity: IActivity) =>
     requests.put(`/activities/${activity.id}`, activity),
-  delete: (id: string) => requests.del(`/activities/${id}`)
+  delete: (id: string) => requests.delete(`/activities/${id}`)
 };
 
 export default {

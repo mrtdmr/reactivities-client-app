@@ -25,10 +25,12 @@ const ActivityList = props => {
                     onClick={() => props.select(a.id)}
                   />
                   <Button
+                    name={a.id}
+                    loading={props.target === a.id && props.submitting}
                     floated='right'
                     content='Delete'
                     color='red'
-                    onClick={() => props.deleteActivity(a.id)}
+                    onClick={event => props.deleteActivity(event, a.id)}
                   />
                   <Label basic content={a.category} />
                 </Item.Extra>

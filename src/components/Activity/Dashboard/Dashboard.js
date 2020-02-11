@@ -12,6 +12,8 @@ const Dashboard = props => {
           select={props.selected}
           activities={props.activities}
           deleteActivity={props.deleteActivity}
+          submitting={props.submitting}
+          target={props.target}
         />
       </Grid.Column>
       <Grid.Column width={6}>
@@ -29,6 +31,7 @@ const Dashboard = props => {
             activity={props.selectedAct}
             createActivity={props.createActivity}
             editActivity={props.editActivity}
+            submitting={props.submitting}
           />
         )}
       </Grid.Column>
