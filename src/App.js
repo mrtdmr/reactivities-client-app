@@ -6,6 +6,10 @@ import Dashboard from './components/Activity/Dashboard/Dashboard';
 import Loading from './components/UI/Loading/Loading';
 import ActivityStore from './stores/activityStore';
 import { observer } from 'mobx-react-lite';
+import { Route } from 'react-router-dom';
+import Home from './components/Home/Home';
+import ActivityForm from './components/Activity/Form/ActivityForm';
+import Detail from './components/Activity/Detail/Detail';
 
 const App = () => {
   const activityStore = useContext(ActivityStore);
@@ -19,7 +23,10 @@ const App = () => {
     <Aux>
       <Navigation />
       <Container style={{ marginTop: '7em' }}>
-        <Dashboard />
+        <Route exact path='/' component={Home} />
+        <Route path='/activities' component={Dashboard} />
+        <Route path='/activities/:id' component={Detail} />
+        <Route path='/create-activity' component={ActivityForm} />
       </Container>
     </Aux>
   );

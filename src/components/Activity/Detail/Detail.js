@@ -5,24 +5,20 @@ import ActivityStore from '../../../stores/activityStore';
 
 const Detail = props => {
   const activityStore = useContext(ActivityStore);
-  const {
-    selectedActivity,
-    openEditForm,
-    cancelSelectedActivity
-  } = activityStore;
+  const { activity, openEditForm, cancelSelectedActivity } = activityStore;
   return (
     <Card fluid>
       <Image
-        src={`/assets/categoryImages/${selectedActivity.category}.jpg`}
+        src={`/assets/categoryImages/${activity.category}.jpg`}
         wrapped
         ui={false}
       />
       <Card.Content>
-        <Card.Header>{selectedActivity.title}</Card.Header>
+        <Card.Header>{activity.title}</Card.Header>
         <Card.Meta>
-          <span>{selectedActivity.date}</span>
+          <span>{activity.date}</span>
         </Card.Meta>
-        <Card.Description>{selectedActivity.description}</Card.Description>
+        <Card.Description>{activity.description}</Card.Description>
       </Card.Content>
       <Card.Content extra>
         <Button.Group widths={2}>
@@ -30,7 +26,7 @@ const Detail = props => {
             basic
             color='blue'
             content='Edit'
-            onClick={() => openEditForm(selectedActivity.id)}
+            onClick={() => openEditForm(activity.id)}
           />
           <Button
             onClick={cancelSelectedActivity}

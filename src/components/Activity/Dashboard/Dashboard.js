@@ -8,18 +8,18 @@ import ActivityStore from '../../../stores/activityStore';
 
 const Dashboard = props => {
   const activityStore = useContext(ActivityStore);
-  const { editMode, selectedActivity } = activityStore;
+  const { editMode, activity } = activityStore;
   return (
     <Grid>
       <Grid.Column width={10}>
         <ActivityList />
       </Grid.Column>
       <Grid.Column width={6}>
-        {selectedActivity && !editMode && <Detail />}
+        {activity && !editMode && <Detail />}
         {editMode && (
           <ActivityForm
-            key={(selectedActivity && selectedActivity.id) || 0}
-            activity={selectedActivity}
+            key={(activity && activity.id) || 0}
+            activity={activity}
           />
         )}
       </Grid.Column>
