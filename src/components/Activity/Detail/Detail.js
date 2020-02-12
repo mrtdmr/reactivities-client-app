@@ -3,10 +3,10 @@ import { Grid } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
 import ActivityStore from '../../../stores/activityStore';
 import Loading from '../../UI/Loading/Loading';
-import Header from './Header';
-import Info from './Info';
-import Chat from './Chat';
-import SideBar from './SideBar';
+import DetailHeader from './DetailHeader';
+import DetailInfo from './DetailInfo';
+import DetailChat from './DetailChat';
+import DetailSideBar from './DetailSideBar';
 
 const Detail = props => {
   const activityStore = useContext(ActivityStore);
@@ -21,12 +21,12 @@ const Detail = props => {
   return (
     <Grid>
       <Grid.Column width={10}>
-        <Header />
-        <Info />
-        <Chat />
+        <DetailHeader activity={activity} />
+        <DetailInfo activity={activity} />
+        <DetailChat />
       </Grid.Column>
       <Grid.Column width={6}>
-        <SideBar />
+        <DetailSideBar />
       </Grid.Column>
     </Grid>
   );

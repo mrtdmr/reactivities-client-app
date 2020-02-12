@@ -1,5 +1,7 @@
 import React from 'react';
-import { Segment, Image, Item, Button } from 'semantic-ui-react';
+import { Segment, Image, Item, Button, Header } from 'semantic-ui-react';
+import { observer } from 'mobx-react-lite';
+import { Link } from 'react-router-dom';
 const activityImageStyle = {
   filter: 'brightness(30%)'
 };
@@ -12,12 +14,12 @@ const activityImageTextStyle = {
   height: 'auto',
   color: 'white'
 };
-const Header = () => {
+const DetailHeader = props => {
   return (
     <Segment.Group>
       <Segment basic attached='top' style={{ padding: '0' }}>
         <Image
-          src={`/assets/placeholder.png`}
+          src={`/assets/categoryImages/${props.activity.category}.jpg`}
           fluid
           style={activityImageStyle}
         />
@@ -27,10 +29,10 @@ const Header = () => {
               <Item.Content>
                 <Header
                   size='huge'
-                  content={'Title'}
+                  content={props.activity.title}
                   style={{ color: 'white' }}
                 />
-                <p>Date</p>
+                <p>{props.activity.date}</p>
                 <p>
                   Hosted by <strong>Bob</strong>
                 </p>
@@ -42,7 +44,12 @@ const Header = () => {
       <Segment clearing attached='bottom'>
         <Button color='teal'>Join Activity</Button>
         <Button>Cancel attendance</Button>
-        <Button color='orange' floated='right'>
+        <Button
+          color='orange'
+          floated='right'
+          as={Link}
+          to={`/manage/${props.activity.id}`}
+        >
           Manage Event
         </Button>
       </Segment>
@@ -50,4 +57,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default observer(DetailHeader);
