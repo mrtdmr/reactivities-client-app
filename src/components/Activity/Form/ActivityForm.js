@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useContext } from 'react';
+import React, { useState, FormEvent, useContext, useEffect } from 'react';
 import { Segment, Form, Button } from 'semantic-ui-react';
 import { v4 as uuid } from 'uuid';
 import ActivityStore from '../../../stores/activityStore';
@@ -10,74 +10,92 @@ const ActivityForm = props => {
     createActivity,
     editActivity,
     submitting,
-    cancelFormOpen
+    activity,
+    loadActivity,
+    clearActivity
   } = activityStore;
-  const initializeForm = () => {
-    if (props.activity) return props.activity;
-    else
-      return {
-        id: '',
-        title: '',
-        category: '',
-        description: '',
-        date: '',
-        city: '',
-        venue: ''
-      };
-  };
-  const [activity, setActivity] = useState(initializeForm);
+
+  const [addActivity, setAddActivity] = useState({
+    id: '',
+    title: '',
+    category: '',
+    description: '',
+    date: '',
+    city: '',
+    venue: ''
+  });
+  useEffect(() => {
+    if (props.match.params.id && addActivity.id.length === 0) {
+      loadActivity(props.match.params.id).then(() => {
+        activity && setAddActivity(activity);
+      });
+    }
+    return () => {
+      clearActivity();
+    };
+  }, [
+    activity,
+    loadActivity,
+    props.match.params.id,
+    clearActivity,
+    addActivity.id.length
+  ]);
   const submitHandler = () => {
-    if (activity.id.length === 0) {
-      let newActivity = { ...activity, id: uuid() };
-      createActivity(newActivity);
+    if (addActivity.id.length === 0) {
+      let newActivity = { ...addActivity, id: uuid() };
+      createActivity(newActivity).then(() =>
+        props.history.push(`/activities/${newActivity.id}`)
+      );
     } else {
-      editActivity(activity);
+      editActivity(addActivity).then(() =>
+        props.history.push(`/activities/${addActivity.id}`)
+      );
     }
   };
   const inputChangeHandler = (
     event: FormEvent<HTMLInputElement | HTMLFormElement>
   ) => {
     const { name, value } = event.currentTarget;
-    setActivity({ ...activity, [name]: value });
+    setAddActivity({ ...addActivity, [name]: value });
   };
   return (
     <Segment clearing>
       <Form onSubmit={submitHandler}>
         <Form.Input
           placeholder='Title'
-          value={activity.title}
+          value={addActivity.title}
           name='title'
           onChange={inputChangeHandler}
         />
         <Form.TextArea
           rows={2}
           placeholder='Description'
-          value={activity.description}
+          value={addActivity.description}
           name='description'
           onChange={inputChangeHandler}
         />
         <Form.Input
           placeholder='Category'
-          value={activity.category}
+          value={addActivity.category}
           name='category'
           onChange={inputChangeHandler}
         />
         <Form.Input
           type='datetime-local'
           placeholder='Date'
-          value={activity.date}
+          value={addActivity.date}
           name='date'
           onChange={inputChangeHandler}
         />
         <Form.Input
           placeholder='City'
-          value={activity.city}
+          value={addActivity.city}
           name='city'
           onChange={inputChangeHandler}
         />
         <Form.Input
           placeholder='Venue'
-          value={activity.venue}
+          value={addActivity.venue}
           name='venue'
           onChange={inputChangeHandler}
         />
@@ -90,9 +108,8 @@ const ActivityForm = props => {
         />
         <Button
           floated='right'
-          type='submit'
           content='Cancel'
-          onClick={cancelFormOpen}
+          onClick={() => props.history.push(`/activities/${addActivity.id}`)}
         />
       </Form>
     </Segment>

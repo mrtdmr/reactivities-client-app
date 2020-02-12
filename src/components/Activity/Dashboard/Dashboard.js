@@ -1,27 +1,25 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Grid } from 'semantic-ui-react';
 import ActivityList from './ActivityList';
-import Detail from '../Detail/Detail';
-import ActivityForm from '../Form/ActivityForm';
 import { observer } from 'mobx-react-lite';
 import ActivityStore from '../../../stores/activityStore';
+import Loading from '../../UI/Loading/Loading';
 
 const Dashboard = props => {
   const activityStore = useContext(ActivityStore);
-  const { editMode, activity } = activityStore;
+  useEffect(() => {
+    activityStore.loadActivities();
+  }, [activityStore]);
+
+  if (activityStore.loadingInitial)
+    return <Loading content='Loading activities...' inverted />;
   return (
     <Grid>
       <Grid.Column width={10}>
         <ActivityList />
       </Grid.Column>
       <Grid.Column width={6}>
-        {activity && !editMode && <Detail />}
-        {editMode && (
-          <ActivityForm
-            key={(activity && activity.id) || 0}
-            activity={activity}
-          />
-        )}
+        <h2>Activity filters</h2>
       </Grid.Column>
     </Grid>
   );

@@ -1,11 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Menu, Container, Button } from 'semantic-ui-react';
-import ActivityStore from '../../stores/activityStore';
 import { observer } from 'mobx-react-lite';
 import { NavLink } from 'react-router-dom';
 
 const Navigation = props => {
-  const activityStore = useContext(ActivityStore);
   return (
     <Menu fixed='top' inverted>
       <Container>
@@ -24,7 +22,6 @@ const Navigation = props => {
             to='/create-activity'
             positive
             content='Create Activity'
-            onClick={activityStore.openCreateForm}
           />
         </Menu.Item>
       </Container>
