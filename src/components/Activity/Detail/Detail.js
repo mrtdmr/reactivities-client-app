@@ -14,10 +14,10 @@ const Detail = props => {
 
   useEffect(() => {
     loadActivity(props.match.params.id);
-  }, [loadActivity, props.match.params.id]);
+  }, [loadActivity, props.match.params.id, props.history]);
 
-  if (loadingInitial || !activity)
-    return <Loading content='Loading activity' inverted />;
+  if (loadingInitial) return <Loading content='Loading activity' inverted />;
+  if (!activity) return <h2>Activity Not Found</h2>;
   return (
     <Grid>
       <Grid.Column width={10}>
