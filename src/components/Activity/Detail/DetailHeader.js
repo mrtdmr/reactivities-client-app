@@ -2,6 +2,8 @@ import React from 'react';
 import { Segment, Image, Item, Button, Header } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+
 const activityImageStyle = {
   filter: 'brightness(30%)'
 };
@@ -32,7 +34,7 @@ const DetailHeader = props => {
                   content={props.activity.title}
                   style={{ color: 'white' }}
                 />
-                <p>{props.activity.date}</p>
+                <p>{format(props.activity.date, 'eeee do MMMM')}</p>
                 <p>
                   Hosted by <strong>Bob</strong>
                 </p>

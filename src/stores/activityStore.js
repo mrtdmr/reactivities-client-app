@@ -1,6 +1,8 @@
 import { observable, action, computed, configure, runInAction } from 'mobx';
 import { createContext } from 'react';
 import agent from '../api/agent';
+import { history } from '../index';
+import { toast } from 'react-toastify';
 
 configure({ enforceActions: 'always' });
 class ActivityStore {
@@ -50,7 +52,7 @@ class ActivityStore {
       const activities = await agent.Activities.list();
       runInAction('loading activities', () => {
         activities.forEach(activity => {
-          activity.date = activity.date.split('.')[0];
+          //activity.date = activity.date.split('.')[0];
           //this.activities.push(activity);
           this.activityRegistry.set(activity.id, activity);
         });
@@ -66,15 +68,19 @@ class ActivityStore {
 
   @action loadActivity = async id => {
     let activity = this.getActivity(id);
-    if (activity) this.activity = activity;
-    else {
+    if (activity) {
+      this.activity = activity;
+      return activity;
+    } else {
       this.loadingInitial = true;
       try {
         activity = await agent.Activities.details(id);
         runInAction('getting activity', () => {
           this.activity = activity;
+          this.activityRegistry.set(activity.id, activity);
           this.loadingInitial = false;
         });
+        return activity;
       } catch (error) {
         runInAction('get activity error', () => {
           this.loadingInitial = false;
@@ -92,37 +98,39 @@ class ActivityStore {
     return this.activityRegistry.get(id);
   };
 
-  @action createActivity = async activity => {
+  @action createActivity = async (activity: IActivity) => {
     this.submitting = true;
     try {
       await agent.Activities.create(activity);
-      //this.activities.push(activity);
-      runInAction('creating activity', () => {
+      runInAction('create activity', () => {
         this.activityRegistry.set(activity.id, activity);
         this.submitting = false;
       });
+      history.push(`/activities/${activity.id}`);
     } catch (error) {
-      runInAction('create activity', () => {
+      runInAction('create activity error', () => {
         this.submitting = false;
       });
-      console.log(error);
+      toast.error('Problem submitting data');
+      console.log(error.response);
     }
   };
 
-  @action editActivity = async activity => {
+  @action editActivity = async (activity: IActivity) => {
     this.submitting = true;
     try {
       await agent.Activities.update(activity);
       runInAction('editing activity', () => {
         this.activityRegistry.set(activity.id, activity);
         this.activity = activity;
-        this.editMode = false;
         this.submitting = false;
       });
+      history.push(`/activities/${activity.id}`);
     } catch (error) {
       runInAction('edit activity error', () => {
         this.submitting = false;
       });
+      toast.error('Problem submitting data');
       console.log(error);
     }
   };

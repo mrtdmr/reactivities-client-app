@@ -1,8 +1,16 @@
-import React, { useState, FormEvent, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Segment, Form, Button, Grid } from 'semantic-ui-react';
 import { v4 as uuid } from 'uuid';
 import ActivityStore from '../../../stores/activityStore';
 import { observer } from 'mobx-react-lite';
+import { Form as FinalForm, Field } from 'react-final-form';
+import TextInput from '../../UI/Form/TextInput/TextInput';
+import TextAreaInput from '../../UI/Form/TextAreaInput/TextAreaInput';
+import SelectInput from '../../UI/Form/SelectInput/SelectInput';
+import { category } from '../../UI/Form/SelectInput/categoryOptions';
+import DateInput from '../../UI/Form/DateInput/DateInput';
+import { combineDateAndTime } from '../../../utils/utils';
+import { activityClass } from '../activityClass';
 
 const ActivityForm = props => {
   const activityStore = useContext(ActivityStore);
@@ -10,112 +18,113 @@ const ActivityForm = props => {
     createActivity,
     editActivity,
     submitting,
-    activity,
-    loadActivity,
-    clearActivity
+    loadActivity
   } = activityStore;
 
-  const [addActivity, setAddActivity] = useState({
-    id: '',
-    title: '',
-    category: '',
-    description: '',
-    date: '',
-    city: '',
-    venue: ''
-  });
+  const [addActivity, setAddActivity] = useState(new activityClass());
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    if (props.match.params.id && addActivity.id.length === 0) {
-      loadActivity(props.match.params.id).then(() => {
-        activity && setAddActivity(activity);
-      });
+    if (props.match.params.id) {
+      setLoading(true);
+      loadActivity(props.match.params.id)
+        .then(activity => {
+          setAddActivity(new activityClass(activity));
+        })
+        .finally(setLoading(false));
     }
-    return () => {
-      clearActivity();
-    };
-  }, [
-    activity,
-    loadActivity,
-    props.match.params.id,
-    clearActivity,
-    addActivity.id.length
-  ]);
-  const submitHandler = () => {
-    if (addActivity.id.length === 0) {
+  }, [loadActivity, props.match.params.id]);
+
+  const finalFormSubmitHandler = values => {
+    const dateAndTime = combineDateAndTime(values.date, values.time);
+    const { date, time, ...addActivity } = values;
+    addActivity.date = dateAndTime;
+
+    if (!addActivity.id) {
       let newActivity = { ...addActivity, id: uuid() };
-      createActivity(newActivity).then(() =>
-        props.history.push(`/activities/${newActivity.id}`)
-      );
+      createActivity(newActivity);
     } else {
-      editActivity(addActivity).then(() =>
-        props.history.push(`/activities/${addActivity.id}`)
-      );
+      editActivity(addActivity);
     }
-  };
-  const inputChangeHandler = (
-    event: FormEvent<HTMLInputElement | HTMLFormElement>
-  ) => {
-    const { name, value } = event.currentTarget;
-    setAddActivity({ ...addActivity, [name]: value });
   };
   return (
     <Grid>
       <Grid.Column width={10}>
         <Segment clearing>
-          <Form onSubmit={submitHandler}>
-            <Form.Input
-              placeholder='Title'
-              value={addActivity.title}
-              name='title'
-              onChange={inputChangeHandler}
-            />
-            <Form.TextArea
-              rows={2}
-              placeholder='Description'
-              value={addActivity.description}
-              name='description'
-              onChange={inputChangeHandler}
-            />
-            <Form.Input
-              placeholder='Category'
-              value={addActivity.category}
-              name='category'
-              onChange={inputChangeHandler}
-            />
-            <Form.Input
-              type='datetime-local'
-              placeholder='Date'
-              value={addActivity.date}
-              name='date'
-              onChange={inputChangeHandler}
-            />
-            <Form.Input
-              placeholder='City'
-              value={addActivity.city}
-              name='city'
-              onChange={inputChangeHandler}
-            />
-            <Form.Input
-              placeholder='Venue'
-              value={addActivity.venue}
-              name='venue'
-              onChange={inputChangeHandler}
-            />
-            <Button
-              positive
-              floated='right'
-              type='submit'
-              content='Submit'
-              loading={submitting}
-            />
-            <Button
-              floated='right'
-              content='Cancel'
-              onClick={() =>
-                props.history.push(`/activities/${addActivity.id}`)
-              }
-            />
-          </Form>
+          <FinalForm
+            initialValues={addActivity}
+            onSubmit={finalFormSubmitHandler}
+            render={({ handleSubmit }) => (
+              <Form onSubmit={handleSubmit} loading={loading}>
+                <Field
+                  placeholder='Title'
+                  value={addActivity.title}
+                  name='title'
+                  component={TextInput}
+                />
+                <Field
+                  placeholder='Description'
+                  value={addActivity.description}
+                  name='description'
+                  rows='3'
+                  component={TextAreaInput}
+                />
+                <Field
+                  placeholder='Category'
+                  value={addActivity.category}
+                  name='category'
+                  options={category}
+                  component={SelectInput}
+                />
+                <Form.Group widths='equal'>
+                  <Field
+                    placeholder='Date'
+                    date={true}
+                    value={addActivity.date}
+                    name='date'
+                    component={DateInput}
+                  />
+                  <Field
+                    placeholder='Time'
+                    time={true}
+                    value={addActivity.time}
+                    name='time'
+                    component={DateInput}
+                  />
+                </Form.Group>
+                <Field
+                  placeholder='City'
+                  value={addActivity.city}
+                  name='city'
+                  component={TextInput}
+                />
+                <Field
+                  placeholder='Venue'
+                  value={addActivity.venue}
+                  name='venue'
+                  component={TextInput}
+                />
+                <Button
+                  loading={submitting}
+                  disabled={loading}
+                  floated='right'
+                  positive
+                  type='submit'
+                  content='Submit'
+                />
+                <Button
+                  floated='right'
+                  content='Cancel'
+                  onClick={
+                    addActivity.id
+                      ? () =>
+                          props.history.push(`/activities/${addActivity.id}`)
+                      : () => props.history.push(`/activities/`)
+                  }
+                  disabled={loading}
+                />
+              </Form>
+            )}
+          />
         </Segment>
       </Grid.Column>
     </Grid>
