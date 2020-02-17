@@ -11,6 +11,27 @@ import { category } from '../../UI/Form/SelectInput/categoryOptions';
 import DateInput from '../../UI/Form/DateInput/DateInput';
 import { combineDateAndTime } from '../../../utils/utils';
 import { activityClass } from '../activityClass';
+import {
+  combineValidators,
+  isRequired,
+  composeValidators,
+  hasLengthGreaterThan
+} from 'revalidate';
+
+const validate = combineValidators({
+  title: isRequired({ message: 'The event title is required.' }),
+  category: isRequired('Category'),
+  description: composeValidators(
+    isRequired('Description'),
+    hasLengthGreaterThan(4)({
+      message: 'Description needs to be at least 5 characters'
+    })
+  )(),
+  city: isRequired('City'),
+  venue: isRequired('Venue'),
+  date: isRequired('Date'),
+  time: isRequired('Time')
+});
 
 const ActivityForm = props => {
   const activityStore = useContext(ActivityStore);
@@ -51,9 +72,10 @@ const ActivityForm = props => {
       <Grid.Column width={10}>
         <Segment clearing>
           <FinalForm
+            validate={validate}
             initialValues={addActivity}
             onSubmit={finalFormSubmitHandler}
-            render={({ handleSubmit }) => (
+            render={({ handleSubmit, invalid, pristine }) => (
               <Form onSubmit={handleSubmit} loading={loading}>
                 <Field
                   placeholder='Title'
@@ -105,7 +127,7 @@ const ActivityForm = props => {
                 />
                 <Button
                   loading={submitting}
-                  disabled={loading}
+                  disabled={loading || invalid || pristine}
                   floated='right'
                   positive
                   type='submit'

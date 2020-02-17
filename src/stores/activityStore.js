@@ -98,7 +98,7 @@ class ActivityStore {
     return this.activityRegistry.get(id);
   };
 
-  @action createActivity = async (activity: IActivity) => {
+  @action createActivity = async activity => {
     this.submitting = true;
     try {
       await agent.Activities.create(activity);
@@ -116,7 +116,7 @@ class ActivityStore {
     }
   };
 
-  @action editActivity = async (activity: IActivity) => {
+  @action editActivity = async activity => {
     this.submitting = true;
     try {
       await agent.Activities.update(activity);
@@ -131,7 +131,7 @@ class ActivityStore {
         this.submitting = false;
       });
       toast.error('Problem submitting data');
-      console.log(error);
+      console.log(error.response);
     }
   };
 

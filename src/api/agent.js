@@ -4,22 +4,26 @@ import { toast } from 'react-toastify';
 axios.defaults.baseURL = 'http://localhost:5000/api';
 
 axios.interceptors.response.use(undefined, error => {
+  const { status, data, config } = error.response;
   if (error.message === 'Network Error' && !error.response)
     toast.error('Netwok Error - make sure API is running');
-  const { status, data, config } = error.response;
-  if (status === 404) history.push('/notfound');
+  if (status === 404) {
+    history.push('/notfound');
+  }
   if (
     status === 400 &&
     config.method === 'get' &&
     data.errors.hasOwnProperty('id')
-  )
+  ) {
     history.push('/notfound');
+  }
   if (status === 500)
     toast.error('Server Error - check the terminal for more info');
+  throw error;
 });
 
 const responseBody = (response: AxiosResponse) => {
-  return response.data;
+  return response && response.data;
 };
 
 const sleep = ms => (response: AxiosResponse) =>
@@ -50,11 +54,10 @@ const requests = {
 };
 
 const Activities = {
-  list: (): Promise<IActivity[]> => requests.get('/activities'),
+  list: () => requests.get('/activities'),
   details: (id: string) => requests.get(`/activities/${id}`),
-  create: (activity: IActivity) => requests.post('/activities', activity),
-  update: (activity: IActivity) =>
-    requests.put(`/activities/${activity.id}`, activity),
+  create: activity => requests.post('/activities', activity),
+  update: activity => requests.put(`/activities/${activity.id}`, activity),
   delete: (id: string) => requests.delete(`/activities/${id}`)
 };
 

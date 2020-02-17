@@ -1,4 +1,5 @@
 export const combineDateAndTime = (d, t) => {
+  if (!d || !t) return;
   const date = new Date(d);
   const time = new Date(t);
   const timeString = time.getHours() + ':' + time.getMinutes() + ':00';
