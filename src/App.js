@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Container } from 'semantic-ui-react';
 import Navigation from './components/Navigation/Navigation';
 import Aux from './hoc/Auxiliary/Auxiliary';
@@ -10,10 +10,23 @@ import ActivityForm from './components/Activity/Form/ActivityForm';
 import Detail from './components/Activity/Detail/Detail';
 import NotFound from './components/Navigation/NotFound/NotFound';
 import { ToastContainer } from 'react-toastify';
+import Login from './components/User/LoginForm';
+import { RootStoreContext } from './stores/rootStore';
+import Loading from './components/UI/Loading/Loading';
+import ModalContainer from './components/UI/Modal/ModalContainer';
 
 const App = props => {
+  const rootStore = useContext(RootStoreContext);
+  const { setAppLoaded, token, appLoaded } = rootStore.commonStore;
+  const { getUser } = rootStore.userStore;
+  useEffect(() => {
+    if (token) getUser().finally(() => setAppLoaded());
+    else setAppLoaded();
+  }, [getUser, setAppLoaded, token]);
+  if (!appLoaded) return <Loading content='Loading app...' />;
   return (
     <Aux>
+      <ModalContainer />
       <ToastContainer position='bottom-right' />
       <Route exact path='/' component={Home} />
       <Route
@@ -31,6 +44,7 @@ const App = props => {
                   path={['/create-activity', '/manage/:id']}
                   component={ActivityForm}
                 />
+                <Route path='/login' component={Login} />
                 <Route component={NotFound} />
               </Switch>
             </Container>

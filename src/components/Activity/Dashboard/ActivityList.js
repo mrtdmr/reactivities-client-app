@@ -1,20 +1,21 @@
 import React, { useContext } from 'react';
 import { Item, Label } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
-import ActivityStore from '../../../stores/activityStore';
 import ActivityListItem from './ActivityListItem';
 import Aux from '../../../hoc/Auxiliary/Auxiliary';
+import { RootStoreContext } from '../../../stores/rootStore';
+import { format } from 'date-fns';
 
 const ActivityList = props => {
-  const activityStore = useContext(ActivityStore);
-  const { activitiesByDate } = activityStore;
+  const rootStore = useContext(RootStoreContext);
+  const { activitiesByDate } = rootStore.activityStore;
   return (
     <Aux>
       {activitiesByDate.map(([group, activities]) => (
         <Aux key={group}>
           {' '}
           <Label size='large' color='blue'>
-            {group}
+            {format(group, 'eeee do MMMM')}
           </Label>
           <Item.Group divided>
             {activities.map(a => (

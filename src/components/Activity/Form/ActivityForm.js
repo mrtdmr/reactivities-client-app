@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Segment, Form, Button, Grid } from 'semantic-ui-react';
 import { v4 as uuid } from 'uuid';
-import ActivityStore from '../../../stores/activityStore';
 import { observer } from 'mobx-react-lite';
 import { Form as FinalForm, Field } from 'react-final-form';
 import TextInput from '../../UI/Form/TextInput/TextInput';
@@ -17,6 +16,7 @@ import {
   composeValidators,
   hasLengthGreaterThan
 } from 'revalidate';
+import { RootStoreContext } from '../../../stores/rootStore';
 
 const validate = combineValidators({
   title: isRequired({ message: 'The event title is required.' }),
@@ -34,13 +34,13 @@ const validate = combineValidators({
 });
 
 const ActivityForm = props => {
-  const activityStore = useContext(ActivityStore);
+  const rootStore = useContext(RootStoreContext);
   const {
     createActivity,
     editActivity,
     submitting,
     loadActivity
-  } = activityStore;
+  } = rootStore.activityStore;
 
   const [addActivity, setAddActivity] = useState(new activityClass());
   const [loading, setLoading] = useState(false);

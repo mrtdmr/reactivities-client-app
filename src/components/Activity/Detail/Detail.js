@@ -1,16 +1,16 @@
 import React, { useContext, useEffect } from 'react';
 import { Grid } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
-import ActivityStore from '../../../stores/activityStore';
 import Loading from '../../UI/Loading/Loading';
 import DetailHeader from './DetailHeader';
 import DetailInfo from './DetailInfo';
 import DetailChat from './DetailChat';
 import DetailSideBar from './DetailSideBar';
+import { RootStoreContext } from '../../../stores/rootStore';
 
 const Detail = props => {
-  const activityStore = useContext(ActivityStore);
-  const { activity, loadActivity, loadingInitial } = activityStore;
+  const rootStore = useContext(RootStoreContext);
+  const { activity, loadActivity, loadingInitial } = rootStore.activityStore;
 
   useEffect(() => {
     loadActivity(props.match.params.id);
