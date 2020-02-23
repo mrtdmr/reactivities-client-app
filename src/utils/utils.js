@@ -9,3 +9,18 @@ export const combineDateAndTime = (d, t) => {
   const dateString = `${year}-${month}-${day}`;
   return new Date(dateString + ' ' + timeString).toISOString();
 };
+export const setActivityProps = (activity, user) => {
+  activity.isGoing = activity.attendees.some(a => a.userName === user.userName);
+  activity.isHost = activity.attendees.some(
+    a => a.userName === user.userName && a.isHost
+  );
+  return activity;
+};
+export const createAttendee = user => {
+  return {
+    displayName: user.displayName,
+    isHost: false,
+    userName: user.userName,
+    image: user.image
+  };
+};

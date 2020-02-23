@@ -26,7 +26,7 @@ const Detail = props => {
         <DetailChat />
       </Grid.Column>
       <Grid.Column width={6}>
-        <DetailSideBar />
+        <DetailSideBar attendees={activity.attendees} />
       </Grid.Column>
     </Grid>
   );

@@ -3,6 +3,7 @@ import agent from '../api/agent';
 import { history } from '../index';
 import { toast } from 'react-toastify';
 import { RootStore } from './rootStore';
+import { setActivityProps, createAttendee } from '../utils/utils';
 
 export default class ActivityStore {
   rootStore: RootStore;
@@ -14,6 +15,7 @@ export default class ActivityStore {
   @observable activity = null;
   @observable submitting = false;
   @observable target = '';
+  @observable loading = false;
 
   @computed get activitiesByDate() {
     return this.groupActivitiesByDate(
@@ -57,6 +59,7 @@ export default class ActivityStore {
         activities.forEach(activity => {
           //activity.date = activity.date.split('.')[0];
           //this.activities.push(activity);
+          setActivityProps(activity, this.rootStore.userStore.user);
           this.activityRegistry.set(activity.id, activity);
         });
         this.loadingInitial = false;
@@ -68,7 +71,6 @@ export default class ActivityStore {
       console.log(error);
     }
   };
-
   @action loadActivity = async id => {
     let activity = this.getActivity(id);
     if (activity) {
@@ -79,6 +81,7 @@ export default class ActivityStore {
       try {
         activity = await agent.Activities.details(id);
         runInAction('getting activity', () => {
+          setActivityProps(activity, this.rootStore.userStore.user);
           this.activity = activity;
           this.activityRegistry.set(activity.id, activity);
           this.loadingInitial = false;
@@ -92,19 +95,22 @@ export default class ActivityStore {
       }
     }
   };
-
   @action clearActivity = () => {
     this.activity = null;
   };
-
   getActivity = id => {
     return this.activityRegistry.get(id);
   };
-
   @action createActivity = async activity => {
     this.submitting = true;
     try {
       await agent.Activities.create(activity);
+      const attendee = createAttendee(this.rootStore.userStore.user);
+      attendee.isHost = true;
+      let attendees = [];
+      attendees.push(attendee);
+      activity.attendees = attendees;
+      activity.isHost = true;
       runInAction('create activity', () => {
         this.activityRegistry.set(activity.id, activity);
         this.submitting = false;
@@ -118,7 +124,6 @@ export default class ActivityStore {
       console.log(error.response);
     }
   };
-
   @action editActivity = async activity => {
     this.submitting = true;
     try {
@@ -137,7 +142,6 @@ export default class ActivityStore {
       console.log(error.response);
     }
   };
-
   @action deleteActivity = async (event, id) => {
     this.submitting = true;
     this.target = event.currentTarget.name;
@@ -154,6 +158,47 @@ export default class ActivityStore {
         this.target = '';
       });
       console.log(error);
+    }
+  };
+  @action attendActivity = async () => {
+    const attendee = createAttendee(this.rootStore.userStore.user);
+    this.loading = true;
+    try {
+      await agent.Activities.attend(this.activity.id);
+      runInAction(() => {
+        if (this.activity) {
+          this.activity.attendees.push(attendee);
+          this.activity.isGoing = true;
+          this.activityRegistry.set(this.activity.id, this.activity);
+          this.loading = false;
+        }
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.loading = false;
+      });
+      toast.error('Problem signing up to activity');
+    }
+  };
+  @action cancelAttendance = async () => {
+    this.loading = true;
+    try {
+      await agent.Activities.unAttend(this.activity.id);
+      runInAction(() => {
+        if (this.activity) {
+          this.activity.attendees = this.activity.attendees.filter(
+            a => a.userName !== this.rootStore.userStore.user.userName
+          );
+          this.activity.isGoing = false;
+          this.activityRegistry.set(this.activity.id, this.activity);
+          this.loading = false;
+        }
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.loading = false;
+      });
+      toast.error('Problem cancelling attendance');
     }
   };
 }

@@ -53,14 +53,23 @@ const requests = {
   put: (url: string, body: {}) => {
     axios
       .put(url, body)
-      .then(sleep(3000))
+      .then(sleep(1000))
       .then(responseBody);
   },
   delete: (url: string) =>
     axios
       .delete(url)
       .then(sleep(1000))
-      .then(responseBody)
+      .then(responseBody),
+  postForm: (url, file) => {
+    let formData = new FormData();
+    formData.append('File', file);
+    return axios
+      .post(url, formData, {
+        headers: { 'Content-type': 'multipart/form-data' }
+      })
+      .then(responseBody);
+  }
 };
 
 const Activities = {
@@ -68,15 +77,24 @@ const Activities = {
   details: (id: string) => requests.get(`/activities/${id}`),
   create: activity => requests.post('/activities', activity),
   update: activity => requests.put(`/activities/${activity.id}`, activity),
-  delete: (id: string) => requests.delete(`/activities/${id}`)
+  delete: (id: string) => requests.delete(`/activities/${id}`),
+  attend: (id: string) => requests.post(`/activities/${id}/attend`, {}),
+  unAttend: (id: string) => requests.delete(`/activities/${id}/attend`, {})
 };
 const User = {
   current: (): Promise => requests.get('/user'),
   login: (user): Promise => requests.post(`/user/login`, user),
   register: (user): Promise => requests.post(`/user/register`, user)
 };
+const Profiles = {
+  get: (username): Promise => requests.get(`/profiles/${username}`),
+  uploadPhoto: (photo): Promise => requests.postForm(`/photos`, photo),
+  setMainPhoto: id => requests.post(`/photos/${id}/setmain`, {}),
+  deletePhoto: id => requests.delete(`/photos/${id}`)
+};
 
 export default {
   Activities,
-  User
+  User,
+  Profiles
 };
