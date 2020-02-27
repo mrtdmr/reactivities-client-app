@@ -14,7 +14,7 @@ const ActivityListItem = props => {
             <Item.Image
               size='tiny'
               circular
-              src={host.image || '/assets/user.png'}
+              src={(host && host.image) || '/assets/user.png'}
               style={{ marginBottom: 3 }}
             />
             <Item.Content>
@@ -23,9 +23,9 @@ const ActivityListItem = props => {
               </Item.Header>
               <Item.Description>
                 Hosted by
-                <Link to={`/profile/${host.userName}`}>
+                <Link to={`/profile/${host && host.userName}`}>
                   {' '}
-                  {host.displayName}
+                  {host && host.displayName}
                 </Link>
               </Item.Description>
               <Item.Description>
