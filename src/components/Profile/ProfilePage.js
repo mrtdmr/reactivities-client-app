@@ -8,7 +8,16 @@ import Loading from '../UI/Loading/Loading';
 
 const ProfilePage = props => {
   const rootStore = useContext(RootStoreContext);
-  const { loadingProfile, profile, loadProfile } = rootStore.profileStore;
+  const {
+    loadingProfile,
+    profile,
+    loadProfile,
+    follow,
+    unFollow,
+    isCurrentUser,
+    loading,
+    setActiveTab
+  } = rootStore.profileStore;
 
   useEffect(() => {
     loadProfile(props.match.params.username);
@@ -17,8 +26,14 @@ const ProfilePage = props => {
   return (
     <Grid>
       <Grid.Column width={16}>
-        <ProfileHeader profile={profile} />
-        <ProfileContent />
+        <ProfileHeader
+          profile={profile}
+          follow={follow}
+          unFollow={unFollow}
+          isCurrentUser={isCurrentUser}
+          loading={loading}
+        />
+        <ProfileContent setActiveTab={setActiveTab} />
       </Grid.Column>
     </Grid>
   );

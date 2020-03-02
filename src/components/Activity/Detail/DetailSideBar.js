@@ -27,7 +27,9 @@ const DetailSideBar = props => {
                   style={{ position: 'absolute' }}
                   color='orange'
                   ribbon='right'
-                ></Label>
+                >
+                  Host
+                </Label>
               )}
               <Image size='tiny' src={attendee.image || '/assets/user.png'} />
               <Item.Content verticalAlign='middle'>
@@ -36,7 +38,9 @@ const DetailSideBar = props => {
                     {attendee.displayName}
                   </Link>
                 </Item.Header>
-                <Item.Extra style={{ color: 'orange' }}>Following</Item.Extra>
+                {attendee.following && (
+                  <Item.Extra style={{ color: 'orange' }}>Following</Item.Extra>
+                )}
               </Item.Content>
             </Item>
           ))}

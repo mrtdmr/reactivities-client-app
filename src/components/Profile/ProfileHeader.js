@@ -31,23 +31,37 @@ const ProfileHeader = props => {
         </Grid.Column>
         <Grid.Column width={4}>
           <Statistic.Group widths={2}>
-            <Statistic label='Followers' value='5' />
-            <Statistic label='Following' value='42' />
+            <Statistic label='Followers' value={props.profile.followersCount} />
+            <Statistic label='Following' value={props.profile.followingCount} />
           </Statistic.Group>
           <Divider />
-          <Reveal animated='move'>
-            <Reveal.Content visible style={{ width: '100%' }}>
-              <Button fluid color='teal' content='Following' />
-            </Reveal.Content>
-            <Reveal.Content hidden>
-              <Button
-                fluid
-                basic
-                color={true ? 'red' : 'green'}
-                content={true ? 'Unfollow' : 'Follow'}
-              />
-            </Reveal.Content>
-          </Reveal>
+          {!props.isCurrentUser && (
+            <Reveal animated='move'>
+              <Reveal.Content visible style={{ width: '100%' }}>
+                <Button
+                  fluid
+                  color='teal'
+                  content={
+                    props.profile.following ? 'Following' : 'Not Following'
+                  }
+                />
+              </Reveal.Content>
+              <Reveal.Content hidden>
+                <Button
+                  loading={props.loading}
+                  fluid
+                  basic
+                  color={props.profile.following ? 'red' : 'green'}
+                  content={props.profile.following ? 'Unfollow' : 'Follow'}
+                  onClick={() =>
+                    props.profile.following
+                      ? props.unFollow(props.profile.userName)
+                      : props.follow(props.profile.userName)
+                  }
+                />
+              </Reveal.Content>
+            </Reveal>
+          )}
         </Grid.Column>
       </Grid>
     </Segment>
