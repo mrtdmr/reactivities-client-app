@@ -1,4 +1,4 @@
-import { observable, action, computed, runInAction } from 'mobx';
+import { observable, action, computed, runInAction, reaction } from 'mobx';
 import agent from '../api/agent';
 import { history } from '../index';
 import { toast } from 'react-toastify';
@@ -10,10 +10,20 @@ import {
   LogLevel
 } from '@microsoft/signalr';
 
+const LIMIT = 2;
+
 export default class ActivityStore {
   rootStore: RootStore;
   constructor(rootStore) {
     this.rootStore = rootStore;
+    reaction(
+      () => this.predicate.keys(),
+      () => {
+        this.page = 0;
+        this.activityRegistry.clear();
+        this.loadActivities();
+      }
+    );
   }
   @observable activityRegistry = new Map();
   @observable loadingInitial = false;
@@ -22,7 +32,13 @@ export default class ActivityStore {
   @observable target = '';
   @observable loading = false;
   @observable.ref hubConnection: HubConnection | null = null;
+  @observable activityCount = 0;
+  @observable page = 0;
+  @observable predicate = new Map();
 
+  @computed get totalPages() {
+    return Math.ceil(this.activityCount / LIMIT);
+  }
   @computed get activitiesByDate() {
     return this.groupActivitiesByDate(
       Array.from(this.activityRegistry.values())
@@ -60,7 +76,8 @@ export default class ActivityStore {
   @action loadActivities = async () => {
     this.loadingInitial = true;
     try {
-      const activities = await agent.Activities.list();
+      const activitiesEnvelope = await agent.Activities.list(this.axiosParams);
+      const { activities, activityCount } = activitiesEnvelope;
       runInAction('loading activities', () => {
         activities.forEach(activity => {
           //activity.date = activity.date.split('.')[0];
@@ -68,6 +85,7 @@ export default class ActivityStore {
           setActivityProps(activity, this.rootStore.userStore.user);
           this.activityRegistry.set(activity.id, activity);
         });
+        this.activityCount = activityCount;
         this.loadingInitial = false;
       });
     } catch (error) {
@@ -252,4 +270,21 @@ export default class ActivityStore {
       */
     this.hubConnection.stop();
   };
+  @action setPage = page => {
+    this.page = page;
+  };
+  @action setPredicate = (predicate, value) => {
+    this.predicate.clear();
+    if (predicate !== 'all') this.predicate.set(predicate, value);
+  };
+  @computed get axiosParams() {
+    const params = new URLSearchParams();
+    params.append('limit', LIMIT);
+    params.append('offset', `${this.page ? this.page * LIMIT : 0}`);
+    this.predicate.forEach((value, key) => {
+      if (key === 'startDate') params.append(key, value.toISOString());
+      else params.append(key, value);
+    });
+    return params;
+  }
 }

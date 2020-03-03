@@ -73,7 +73,11 @@ const requests = {
 };
 
 const Activities = {
-  list: (): Promise => requests.get('/activities'),
+  list: (params): Promise =>
+    axios
+      .get(`/activities`, { params })
+      .then(sleep(1000))
+      .then(responseBody),
   details: (id: string) => requests.get(`/activities/${id}`),
   create: activity => requests.post('/activities', activity),
   update: activity => requests.put(`/activities/${activity.id}`, activity),
@@ -94,7 +98,9 @@ const Profiles = {
   follow: username => requests.post(`/profiles/${username}/follow`, {}),
   unFollow: username => requests.delete(`/profiles/${username}/follow`),
   listFollowings: (username, predicate) =>
-    requests.get(`/profiles/${username}/follow?predicate=${predicate}`)
+    requests.get(`/profiles/${username}/follow?predicate=${predicate}`),
+  listActivities: (userName, predicate) =>
+    requests.get(`/profiles/${userName}/activities?predicate=${predicate}`)
 };
 
 export default {

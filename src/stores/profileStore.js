@@ -25,6 +25,8 @@ export default class ProfileStore {
   @observable loading = false;
   @observable followings = [];
   @observable activeTab = 0;
+  @observable userActivities = [];
+  @observable loadingActivities = false;
 
   @computed get isCurrentUser() {
     if (this.rootStore.userStore.user && this.profile)
@@ -157,5 +159,23 @@ export default class ProfileStore {
   };
   @action setActiveTab = activeIndex => {
     this.activeTab = activeIndex;
+  };
+  @action loadUserActivities = async (userName, predicate) => {
+    this.loadingActivities = true;
+    try {
+      const activities = await agent.Profiles.listActivities(
+        userName,
+        predicate
+      );
+      runInAction(() => {
+        this.userActivities = activities;
+        this.loadingActivities = false;
+      });
+    } catch (error) {
+      toast.error('Problem loading activities.');
+      runInAction(() => {
+        this.loadingActivities = false;
+      });
+    }
   };
 }
