@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { history } from '../index';
 import { toast } from 'react-toastify';
-axios.defaults.baseURL = 'http://localhost:5000/api';
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 axios.interceptors.request.use(
   config => {
@@ -14,11 +14,16 @@ axios.interceptors.request.use(
   }
 );
 axios.interceptors.response.use(undefined, error => {
-  const { status, data, config } = error.response;
+  const { status, data, config, headers } = error.response;
   if (error.message === 'Network Error' && !error.response)
     toast.error('Netwok Error - make sure API is running');
   if (status === 404) {
     history.push('/notfound');
+  }
+  if (status === 401 && headers['www-authenticate'].includes('invalid_token')) {
+    window.localStorage.removeItem('jwt');
+    history.push('/');
+    toast.info('Your session has expired, please login again.');
   }
   if (
     status === 400 &&
@@ -36,30 +41,32 @@ const responseBody = (response: AxiosResponse) => {
   return response && response.data;
 };
 
+/*
 const sleep = ms => (response: AxiosResponse) =>
   new Promise(resolve => setTimeout(() => resolve(response), ms));
+  */
 
 const requests = {
   get: (url: string) =>
     axios
       .get(url)
-      .then(sleep(1000))
+      //.then(sleep(1000))
       .then(responseBody),
   post: (url: string, body: {}) =>
     axios
       .post(url, body)
-      .then(sleep(1000))
+      //.then(sleep(1000))
       .then(responseBody),
   put: (url: string, body: {}) => {
     axios
       .put(url, body)
-      .then(sleep(1000))
+      //.then(sleep(1000))
       .then(responseBody);
   },
   delete: (url: string) =>
     axios
       .delete(url)
-      .then(sleep(1000))
+      //.then(sleep(1000))
       .then(responseBody),
   postForm: (url, file) => {
     let formData = new FormData();
@@ -76,7 +83,7 @@ const Activities = {
   list: (params): Promise =>
     axios
       .get(`/activities`, { params })
-      .then(sleep(1000))
+      //.then(sleep(1000))
       .then(responseBody),
   details: (id: string) => requests.get(`/activities/${id}`),
   create: activity => requests.post('/activities', activity),

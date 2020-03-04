@@ -1,5 +1,6 @@
 export const combineDateAndTime = (d, t) => {
   if (!d || !t) return;
+  /*
   const date = new Date(d);
   const time = new Date(t);
   const timeString = time.getHours() + ':' + time.getMinutes() + ':00';
@@ -8,6 +9,11 @@ export const combineDateAndTime = (d, t) => {
   const day = date.getDate();
   const dateString = `${year}-${month}-${day}`;
   return new Date(dateString + ' ' + timeString).toISOString();
+  */
+
+  const dateString = new Date(d).toISOString().split('T')[0];
+  const timeString = new Date(t).toISOString().split('T')[1];
+  return new Date(dateString + 'T' + timeString);
 };
 export const setActivityProps = (activity, user) => {
   activity.isGoing = activity.attendees.some(a => a.userName === user.userName);
