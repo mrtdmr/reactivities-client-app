@@ -9,6 +9,7 @@ import ScrollToTop from './components/UI/ScrollToTop/ScrollToTop';
 import 'react-toastify/dist/ReactToastify.min.css';
 import 'react-widgets/dist/css/react-widgets.css';
 import dateFnsLocalizer from 'react-widgets-date-fns';
+import 'semantic-ui-css/semantic.min.css';
 
 dateFnsLocalizer();
 export const history = createBrowserHistory();
